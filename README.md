@@ -3,4 +3,4 @@
 # Janji
 Saya Muhammad Igin Adigholib dengan NIM 2301125 mengerjakan Laporan Praktikum 1 dalam mata kuliah Desain dan Pemrograman Berorientasi Objek untuk keberkahanNya maka saya tidak melakukan kecurangan seperti yang telah dispesifikasikan. Aamiin.
 
-![Dokumentasi](CPP/Dokumentasi/1latmodul1)
+![Dokumentasi](CPP/Dokumentasi/1latmodul1.png)
