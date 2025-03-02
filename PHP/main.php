@@ -1,223 +1,131 @@
 <?php
-require_once 'Petshop.php';
-session_start(); // Mulai sesi untuk menyimpan data secara sementara
+require_once "Baju.php";
+session_start(); // Gunakan session untuk menyimpan daftar produk sementara
 
-$upload = "uploads/";
-if (!file_exists($upload)) {
-    mkdir($upload);
+// Buat folder 'uploads/' jika belum ada
+$upload_dir = "uploads/";
+if (!file_exists($upload_dir)) {
+    mkdir($upload_dir, 0777, true);
 }
 
-// Inisialisasi data jika belum ada dalam sesi
-if (!isset($_SESSION['petshop'])) {
-    $_SESSION['petshop'] = [
-        new Petshop(1, 'Kucing', 'Hewan', 100000, 'image.png'),
-        new Petshop(2, 'Anjing', 'Hewan', 200000, 'anjing.jpg'),
-        new Petshop(3, 'Ikan', 'Hewan', 50000, 'ikan.jpg')
+// Inisialisasi data jika belum ada dalam session
+if (!isset($_SESSION['baju_list'])) {
+    $_SESSION['baju_list'] = [
+        new Baju(1, "Baju", 50000, 10, "uploads/baju1.jpg", "Kaos", "Katun", "Putih", "Kucing", "S", "Kucing"),
+        new Baju(2, "Gelang", 60000, 10, "uploads/gelang.jpg", "Tali", "Woll", "Hitam", "Anjing", "M", "Anjing"),
+        new Baju(3, "Kalung", 70000, 10, "uploads/kalung.jpg", "Tali", "Woll", "Merah", "Hamster", "L", "Hamster"),
+        new Baju(4, "Topi", 80000, 10, "uploads/topi.jpg", "Kain", "Katun", "Biru", "Kelinci", "XL", "Kelinci"),
+        new Baju(5, "Sepatu", 90000, 10, "uploads/sepatu.jpg", "Kulit", "Kulit", "Hijau", "Burung", "XXL", "Burung")
     ];
 }
 
-// Fungsi untuk menampilkan data dalam tabel
-function tampilkanData($keyword = '')
-{
-    echo "<table border='1' class='styled-table'>";
-    echo "<thead><tr><th>ID</th><th>Nama Product</th><th>Kategori</th><th>Harga</th><th>Foto</th><th>Aksi</th></tr></thead>";
-    echo "<tbody>";
-    foreach ($_SESSION['petshop'] as $key => $p) {
-        if ($keyword === '' || stripos($p->getNamaProduct(), $keyword) !== false) {
-            echo "<tr>";
-            echo "<td>" . $p->getId() . "</td>";
-            echo "<td>" . $p->getNamaProduct() . "</td>";
-            echo "<td>" . $p->getKategori() . "</td>";
-            echo "<td>Rp " . number_format($p->getHarga(), 0, ',', '.') . "</td>";
-            echo "<td><img src='uploads/" . $p->getFoto() . "' width='100'></td>";
-            echo "<td>
-                    <a href='?hapus=$key' class='btn-delete'>Hapus</a> |
-                    <a href='?edit=$key' class='btn-edit'>Edit</a>
-                  </td>";
-            echo "</tr>";
+// Hapus Produk
+if (isset($_GET['hapus'])) {
+    $index = $_GET['hapus'];
+    if (isset($_SESSION['baju_list'][$index])) {
+        unset($_SESSION['baju_list'][$index]);
+        $_SESSION['baju_list'] = array_values($_SESSION['baju_list']); // Reset indeks array setelah penghapusan
+    }
+    header("Location: main.php");
+    exit();
+}
+
+// Tambah Produk Baru dengan Upload Foto
+if (isset($_POST['tambah'])) {
+    $id = count($_SESSION['baju_list']) + 1;
+    $nama = $_POST['nama'];
+    $harga = $_POST['harga'];
+    $stok = $_POST['stok'];
+    $jenis = $_POST['jenis'];
+    $bahan = $_POST['bahan'];
+    $warna = $_POST['warna'];
+    $untuk = $_POST['untuk'];
+    $size = $_POST['size'];
+    $merk = $_POST['merk'];
+
+    // Proses Upload Foto
+    $foto = "uploads/default.jpg";
+    if (!empty($_FILES['foto']['name'])) {
+        $foto_nama = time() . "_" . basename($_FILES['foto']['name']);
+        $foto_path = $upload_dir . $foto_nama;
+        if (move_uploaded_file($_FILES['foto']['tmp_name'], $foto_path)) {
+            $foto = $foto_path;
         }
     }
-    echo "</tbody></table>";
+
+    $produk_baru = new Baju($id, $nama, $harga, $stok, $foto, $jenis, $bahan, $warna, $untuk, $size, $merk);
+    $_SESSION['baju_list'][] = $produk_baru;
+
+    header("Location: main.php");
+    exit();
 }
 
-// Tambah Data
-if (isset($_POST['tambah'])) {
-    $id = count($_SESSION['petshop']) + 1;
-    $nama = $_POST['nama'];
-    $kategori = $_POST['kategori'];
-    $harga = $_POST['harga'];
-    
-    if (!empty($_FILES['foto']['name'])) {
-        $foto = $_FILES['foto']['name'];
-        move_uploaded_file($_FILES['foto']['tmp_name'], "uploads/" . $foto);
+// Cetak daftar produk dalam bentuk tabel
+function printTable($baju_list) {
+    echo "<table border='1'>";
+    echo "<tr><th>ID</th><th>Nama</th><th>Harga</th><th>Stok</th><th>Jenis</th><th>Bahan</th><th>Warna</th><th>Untuk</th><th>Size</th><th>Merk</th><th>Foto</th><th>Aksi</th></tr>";
+    foreach ($baju_list as $key => $b) {
+        echo "<tr>";
+        echo "<td>" . $b->getId() . "</td>";
+        echo "<td>" . $b->getNama() . "</td>";
+        echo "<td>Rp " . number_format($b->getHarga(), 0, ',', '.') . "</td>";
+        echo "<td>" . $b->getStok() . "</td>";
+        echo "<td>" . $b->getJenis() . "</td>";
+        echo "<td>" . $b->getBahan() . "</td>";
+        echo "<td>" . $b->getWarna() . "</td>";
+        echo "<td>" . $b->getUntuk() . "</td>";
+        echo "<td>" . $b->getSize() . "</td>";
+        echo "<td>" . $b->getMerk() . "</td>";
+        echo "<td><img src='" . $b->getFoto() . "' width='100'></td>";
+        echo "<td><a href='?hapus=$key' onclick='return confirm(\"Apakah Anda yakin ingin menghapus produk ini?\")'>Hapus</a></td>";
+        echo "</tr>";
     }
-
-    $_SESSION['petshop'][] = new Petshop($id, $nama, $kategori, $harga, $foto);
-    header("Location: main.php");
-}
-
-// Hapus Data
-if (isset($_GET['hapus'])) {
-    unset($_SESSION['petshop'][$_GET['hapus']]);
-    $_SESSION['petshop'] = array_values($_SESSION['petshop']); // Reset array keys
-    header("Location: main.php");
-}
-
-// Edit Data
-if (isset($_POST['update'])) {
-    $index = $_POST['index'];
-    $_SESSION['petshop'][$index]->setNamaProduct($_POST['nama']);
-    $_SESSION['petshop'][$index]->setKategori($_POST['kategori']);
-    $_SESSION['petshop'][$index]->setHarga($_POST['harga']);
-    
-    if (!empty($_FILES['foto']['name'])) {
-        $foto = $_FILES['foto']['name'];
-        move_uploaded_file($_FILES['foto']['tmp_name'], "uploads/" . $foto);
-        $_SESSION['petshop'][$index]->setFoto($foto);
-    }
-    
-    header("Location: main.php");
+    echo "</table>";
 }
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Petshop</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        table, th, td {
-            border: 1px solid black;
-        }
-        th, td {
-            padding: 10px;
-            text-align: center;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        img {
-            border-radius: 5px;
-        }
-        fieldset {
-            width: 50%;
-            margin: auto;
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid #ccc;
-            background: #f9f9f9;
-        }
-        legend {
-            font-weight: bold;
-            font-size: 18px;
-        }
-        input, select {
-            width: 100%;
-            padding: 8px;
-            margin: 5px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        input[type="submit"] {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            cursor: pointer;
-            padding: 10px;
-            font-size: 16px;
-        }
-        input[type="submit"]:hover {
-            background-color: #218838;
-        }
-        .search-container {
-            width: 50%;
-            margin: auto;
-            text-align: center;
-            padding: 10px;
-        }
-        .search-container input {
-            width: 70%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .search-container button {
-            padding: 8px 15px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .search-container button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+    <title>Petshop - Baju</title>
 </head>
 <body>
+    <h2>Daftar Produk</h2>
+    <?php printTable($_SESSION['baju_list']); ?>
 
-    <h2 style="text-align: center;">Daftar Produk</h2>
+    <h3>Tambah Produk Baru</h3>
+    <form method="post" enctype="multipart/form-data">
+        <label for="nama">Nama Produk:</label>
+        <input type="text" name="nama" required><br>
 
-    <div class="search-container">
-        <form method="GET">
-            <input type="text" name="search" placeholder="Cari produk..." value="<?= isset($_GET['search']) ? $_GET['search'] : '' ?>">
-            <button type="submit">Cari</button>
-        </form>
-    </div>
+        <label for="harga">Harga:</label>
+        <input type="number" name="harga" required><br>
 
-    <?php 
-    tampilkanData(isset($_GET['search']) ? $_GET['search'] : "");
-    ?>
+        <label for="stok">Stok:</label>
+        <input type="number" name="stok" required><br>
 
-    <fieldset>
-        <legend>Tambah Produk</legend>
-        <form method="post" enctype="multipart/form-data">
-            <label for="nama">Nama:</label>
-            <input type="text" name="nama" required>
+        <label for="jenis">Jenis:</label>
+        <input type="text" name="jenis" required><br>
 
-            <label for="kategori">Kategori:</label>
-            <input type="text" name="kategori" required>
+        <label for="bahan">Bahan:</label>
+        <input type="text" name="bahan" required><br>
 
-            <label for="harga">Harga:</label>
-            <input type="number" name="harga" required>
+        <label for="warna">Warna:</label>
+        <input type="text" name="warna" required><br>
 
-            <label for="foto">Foto:</label>
-            <input type="file" name="foto" required>
+        <label for="untuk">Untuk Hewan:</label>
+        <input type="text" name="untuk" required><br>
 
-            <input type="submit" name="tambah" value="Tambah">
-        </form>
-    </fieldset>
+        <label for="size">Size:</label>
+        <input type="text" name="size" required><br>
 
-    <?php if (isset($_GET['edit'])): ?>
-    <fieldset>
-        <legend>Edit Produk</legend>
-        <form method="post" enctype="multipart/form-data">
-            <?php $index = $_GET['edit']; $produk = $_SESSION['petshop'][$index]; ?>
-            <input type="hidden" name="index" value="<?php echo $index; ?>">
+        <label for="merk">Merk:</label>
+        <input type="text" name="merk" required><br>
 
-            <label for="nama">Nama:</label>
-            <input type="text" name="nama" value="<?php echo $produk->getNamaProduct(); ?>" required>
+        <label for="foto">Foto Produk:</label>
+        <input type="file" name="foto"><br>
 
-            <label for="kategori">Kategori:</label>
-            <input type="text" name="kategori" value="<?php echo $produk->getKategori(); ?>" required>
-
-            <label for="harga">Harga:</label>
-            <input type="number" name="harga" value="<?php echo $produk->getHarga(); ?>" required>
-
-            <label for="foto">Foto:</label>
-            <input type="file" name="foto">
-            
-            <input type="submit" name="update" value="Update">
-        </form>
-    </fieldset>
-    <?php endif; ?>
-
+        <input type="submit" name="tambah" value="Tambah Produk">
+    </form>
 </body>
 </html>

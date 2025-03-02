@@ -1,54 +1,44 @@
-from Petshop import PetShop
+from Baju import Baju
 
-def main(): # method main
-    petshop = PetShop() # instance petshop
+def print_table(baju_list):
+    headers = ["ID", "Nama", "Harga", "Stok", "Jenis", "Bahan", "Warna", "Untuk", "Size", "Merk"]
+    col_widths = [max(len(str(int(getattr(b, attr)))) if attr == "_harga_produk" else len(str(getattr(b, attr))) for b in baju_list) for attr in ["_id", "_nama_produk", "_harga_produk", "_stok_produk", "_jenis_aksesoris", "_bahan_aksesoris", "_warna_aksesoris", "_untuk_hewan", "_size_baju", "_merk_baju"]]
+    col_widths = [max(len(h), w) for h, w in zip(headers, col_widths)]
     
-    while True: # loop menu
-        print("\nMENU PETSHOP")
-        print("1. Tambah Produk")
-        print("2. Tampilkan Produk")
-        print("3. Ubah Produk")
-        print("4. Hapus Produk")
-        print("5. Cari Produk")
-        print("0. Keluar")
+    print("-" * (sum(col_widths) + len(headers) + 1))
+    print("|" + "|".join(h.ljust(w) for h, w in zip(headers, col_widths)) + "|")
+    print("-" * (sum(col_widths) + len(headers) + 1))
+    
+    for b in baju_list:
+        print("|" + "|".join(str(int(getattr(b, attr))) if attr == "_harga_produk" else str(getattr(b, attr)).ljust(w) for attr, w in zip(["_id", "_nama_produk", "_harga_produk", "_stok_produk", "_jenis_aksesoris", "_bahan_aksesoris", "_warna_aksesoris", "_untuk_hewan", "_size_baju", "_merk_baju"], col_widths)) + "|")
+    print("-" * (sum(col_widths) + len(headers) + 1))
 
-        pilihan = input("Pilih menu: ")
+def main():
+    list_baju = [
+        Baju(1, "Baju", 50000, 10, "Kaos", "Katun", "Putih", "Kucing", "S", "Kucing"),
+        Baju(2, "Gelang", 60000, 10, "Tali", "Woll", "Hitam", "Anjing", "M", "Anjing"),
+        Baju(3, "Kalung", 70000, 10, "Tali", "Woll", "Merah", "Hamster", "L", "Hamster"),
+        Baju(4, "Topi", 80000, 10, "Kain", "Katun", "Biru", "Kelinci", "XL", "Kelinci"),
+        Baju(5, "Sepatu", 90000, 10, "Kulit", "Kulit", "Hijau", "Burung", "XXL", "Burung")
+    ]
+    print_table(list_baju)
+    
+    # Tambah data baru
+    id = int(input("Masukkan ID: "))
+    nama = input("Masukkan Nama: ")
+    harga = int(input("Masukkan Harga: "))
+    stok = int(input("Masukkan Stok: "))
+    jenis = input("Masukkan Jenis: ")
+    bahan = input("Masukkan Bahan: ")
+    warna = input("Masukkan Warna: ")
+    untuk = input("Masukkan Untuk: ")
+    size = input("Masukkan Size: ")
+    merk = input("Masukkan Merk: ")
+    
+    baju_baru = Baju(id, nama, harga, stok, jenis, bahan, warna, untuk, size, merk)
+    list_baju.append(baju_baru)
+    
+    print_table(list_baju)
 
-        if pilihan == "1":  # jika pilihan = 1 (Tambah Produk)
-            print("\nTambah Produk")
-            id_produk = int(input("ID: "))
-            nama = input("Nama Produk: ")
-            kategori = input("Kategori: ")
-            harga = float(input("Harga: Rp "))
-            petshop.tambah_produk(id_produk, nama, kategori, harga)
-
-        elif pilihan == "2":    # jika pilihan = 2 (Tampilkan Produk)
-            petshop.tampilkan_produk()
-
-        elif pilihan == "3":    # jika pilihan = 3 (Ubah Produk)
-            print("\nUbah Produk")
-            id_produk = int(input("ID Produk yang akan diubah: "))
-            nama = input("Nama Baru: ")
-            kategori = input("Kategori Baru: ")
-            harga = float(input("Harga Baru: Rp "))
-            petshop.ubah_produk(id_produk, nama, kategori, harga)
-
-        elif pilihan == "4":    # jika pilihan = 4 (Hapus Produk)
-            print("\nHapus Produk")
-            id_produk = int(input("ID Produk yang akan dihapus: "))
-            petshop.hapus_produk(id_produk)
-
-        elif pilihan == "5":    # jika pilihan = 5 (Cari Produk)
-            print("\nCari Produk")
-            nama = input("Masukkan nama produk: ")
-            petshop.cari_produk(nama)
-
-        elif pilihan == "0":    # jika pilihan = 0 (Keluar)
-            print("Keluar dari program. Terima kasih!")
-            break
-
-        else:   # jika pilihan tidak valid
-            print("Pilihan tidak valid! Coba lagi.")
-
-if __name__ == "__main__":  # menjalankan method main
+if __name__ == "__main__":
     main()

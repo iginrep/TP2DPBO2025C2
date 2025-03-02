@@ -1,0 +1,48 @@
+input CPP
+6
+Syal
+90000
+1
+Rajut
+Woll
+Putih
+Anjing
+XL
+Anjing
+
+input Java
+6
+Syal
+90000
+1
+Rajut
+Woll
+Putih
+Anjing
+XL
+Anjing
+
+input Python
+6
+Syal
+90000
+1
+Rajut
+Woll
+Putih
+Anjing
+XL
+Anjing
+
+input PHP
+6
+Syal
+90000
+1
+Rajut
+Woll
+Putih
+Anjing
+XL
+Anjing
+foto produk (masukan gambar)
