@@ -10,4 +10,13 @@ Program ini mengimplementasikan sistem manajemen produk di sebuah petshop menggu
 ![Diagram](Diagram/diagram.png)
 
 # Dokumentasi CPP
+![CPP](CPP/Dokumentasi/Tp2CPP1.png)
 
+# Dokumentasi Java
+![JAVA](JAVA/Dokumentasi/Tp2Java1.png)
+
+# Dokumentasi Python
+![PHYTON](PHYTON/Dokumentasi/Tp2python1.png)
+
+# Dokumentasi PHP
+![PHP](PHP/Dokumentasi/Tp2PHP1.png)
