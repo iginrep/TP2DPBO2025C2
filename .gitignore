@@ -1,8 +1,0 @@
-# Ignore all __pycache__ directories
-**/__pycache__/
-
-# Ignore all .exe files
-*.exe
-
-# Ignore all .class files
-*.class
